@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import random
-
 import pymorphy2
 import telebot
-from telebot import types
 from commands import Commands
 from fsa import FSA
-
 import config
-#from database import DatabaseInteraction
+
 
 
 bot = telebot.TeleBot(config.token)
@@ -29,8 +26,6 @@ with open('data/hello.txt', 'r', encoding='utf-8') as hello:
 with open('data/help.txt', 'r', encoding='utf-8') as help:
     help = help.readlines()
 
-with open('data/create.txt', 'r', encoding='utf-8') as ccreate:
-    ccreate = ccreate.readlines()
 
 @bot.message_handler(commands=['start'])
 def send_message(message):
@@ -65,10 +60,6 @@ def handle_command(message, command, recursion=False):
                 elif not recursion:
                     bot.send_message(message.chat.id, r["text"])
                     handle_command(message, r["command"], True)
-
-#@fsa.command_handler(command="handle_json_group")
-#def handle_json_group(cmd, msg_text):
-#    print(msg_text)
 
 
 if __name__ == '__main__':

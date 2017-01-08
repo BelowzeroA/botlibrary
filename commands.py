@@ -44,6 +44,7 @@ class Commands:
         json_str_qs = '"qs": [ {} ]'.format(json_str_qs)
         json_str = '{' + json_str_a + json_str_qs + '}'
         response = self.store_reply_group(cmd, json_str)
+        self.questions.clear()
         if response["ok"] == True:
             return { "text": "Данные успешно загружены", "command": "назад" }
         else:
