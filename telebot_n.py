@@ -47,7 +47,7 @@ def cmd_all(message):
     handle_command(message, command)
 
 
-def handle_command(message, command):
+def handle_command(message, command, recursion=False):
     handled = fsa.handle_command(message, command)
     if handled:
         if fsa.current_command is None:
@@ -62,9 +62,9 @@ def handle_command(message, command):
             if r is not None:
                 if isinstance(r, str):
                     bot.send_message(message.chat.id, r, reply_markup=fsa.current_markup)
-                else:
+                elif not recursion:
                     bot.send_message(message.chat.id, r["text"])
-                    handle_command(message, r["command"])
+                    handle_command(message, r["command"], True)
 
 #@fsa.command_handler(command="handle_json_group")
 #def handle_json_group(cmd, msg_text):
