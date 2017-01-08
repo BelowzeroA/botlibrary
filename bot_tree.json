@@ -1,0 +1,38 @@
+{
+  "id": "root",
+  "commands": [
+    {
+      "id": "learning",
+      "button_text": "Режим обучения",
+      "text": "Обучение Cleverise заключается в предоставлении групп вопросов с общим ответом. Выберите способ ввода",
+      "commands": [
+        {
+          "id": "as_json",
+          "button_text": "В виде json-структуры",
+          "text": "Введите группу ответ-вопросы в формате json. Пример:\n { \"a\": \"answer text\", \"qs\" : [\"question 1\", \"question 2\", \"question 3\" ] }",
+          "handler" : "handle_json_group"
+        },
+        {
+          "id": "step_by_step",
+          "button_text": "Пошаговый ввод",
+          "text": "Введите очередной вопрос. Чтобы перейти к вводу ответа, нажмите Ответ",
+          "handler" : "handle_string_question",
+          "commands": [
+            {
+              "id": "answer",
+              "button_text": "Ответ",
+              "text": "Введите ответ",
+              "handler" : "handle_string_answer"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qa",
+      "button_text": "Вопрос-ответ",
+      "text": "Задайте вопрос в произвольной форме",
+      "commands": []
+    }
+  ]
+}
