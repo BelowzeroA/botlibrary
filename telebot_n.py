@@ -1,30 +1,20 @@
 # -*- coding: utf-8 -*-
-
-import random
-import pymorphy2
 import telebot
 from commands import Commands
 from fsa import FSA
 import config
 
 
-
 bot = telebot.TeleBot(config.token)
-morph = pymorphy2.MorphAnalyzer()
 commands = Commands()
 
 fsa = FSA()
 fsa.load("bot_tree.json")
 
 markuproot = fsa.compose_markup()
-#markuproot.row(commands.id_learning, commands.id_qa)
-#markuproot.row('Примеры работ', {'text': 'Наши контакты' })
 
 with open('data/hello.txt', 'r', encoding='utf-8') as hello:
-    hello = hello.readlines()
-
-with open('data/help.txt', 'r', encoding='utf-8') as help:
-    help = help.readlines()
+    hello = hello.read()
 
 
 @bot.message_handler(commands=['start'])
@@ -32,10 +22,9 @@ def send_message(message):
     """
     Приветственное сообщение.
     """
-    bot.send_message(message.chat.id, random.choice(hello), reply_markup = markuproot)
+    bot.send_message(message.chat.id, hello, reply_markup = markuproot)
 
 
-#@bot.message_handler(func=lambda message: True, content_types=['text'])
 @bot.message_handler(func = lambda message: True)
 def cmd_all(message):
     command = message.text.lower()
@@ -46,7 +35,7 @@ def handle_command(message, command, recursion=False):
     handled = fsa.handle_command(message, command)
     if handled:
         if fsa.current_command is None:
-            bot.send_message(message.chat.id, random.choice(hello), reply_markup=markuproot)
+            bot.send_message(message.chat.id, hello, reply_markup=markuproot)
         else:
             bot.send_message(message.chat.id, fsa.current_text, reply_markup=fsa.current_markup)
     else:

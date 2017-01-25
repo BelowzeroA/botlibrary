@@ -26,7 +26,10 @@ class FSA:
         if command_text == 'назад':
             if self.current_command is None:
                 return True
-            current_command = self.current_command["parent"]
+            self.current_command = self.current_command["parent"]
+            if self.current_command is None:
+                return True
+            current_command = self.current_command
         else:
             current_command = self.traverse_commands(self.states_tree["commands"], command_text)
 
@@ -49,7 +52,9 @@ class FSA:
             if comm["button_text"].lower() == command_text:
                 return comm
             if "commands" in comm:
-                return self.traverse_commands(comm["commands"], command_text)
+                found = self.traverse_commands(comm["commands"], command_text)
+                if found is not None:
+                    return found
         return None
 
     def compose_markup(self):

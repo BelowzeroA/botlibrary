@@ -32,7 +32,7 @@
       "id": "qa",
       "button_text": "Вопрос-ответ",
       "text": "Задайте вопрос в произвольной форме",
-      "commands": []
+      "handler" : "handle_get_answers"
     }
   ]
 }

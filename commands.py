@@ -1,6 +1,4 @@
 import json
-import requests
-from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 
@@ -12,12 +10,31 @@ class Commands:
     def compose_url(self, method, cmd):
         return self.server_addr + method + "?token=testtoken&sender=" + str(cmd["chat_id"])
 
-    def store_reply_group(self, cmd, msg_text):
-        url = self.compose_url("learn/store_reply_group", cmd)
+    @classmethod
+    def store_reply_group(cls, cmd, msg_text):
+        return cls.cleverise_command("learn/store_reply_group", cmd, msg_text)
+
+    def get_answers(self, cmd, msg_text):
+        return self.cleverise_command("qa/get_answers", cmd, msg_text)
+
+    def cleverise_command(self, method, cmd, msg_text):
+        url = self.compose_url(method, cmd)
         binary_data = msg_text.encode('utf-8')
         request = Request(url, data=binary_data)
         raw_response = urlopen(request).read()
         return json.loads(raw_response.decode())
+
+    def handle_get_answers(self, cmd, msg_text):
+        response = self.get_answers(cmd, msg_text)
+        if response is None:
+            return "Ошибка: qa/get_answers вернула пустой ответ"
+        if response["ok"] == True:
+            resp = str(response["answers"])
+            if resp == "[]":
+                resp = "К сожалению, Cleverise не нашел ответа на этот вопрос"
+            return resp
+        else:
+            return "Ошибка: " + str(response["error"]) + "\n " + response["description"]
 
     def handle_json_group(self, cmd, msg_text):
         response = self.store_reply_group(cmd, msg_text)
