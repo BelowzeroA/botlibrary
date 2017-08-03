@@ -19,6 +19,7 @@ class FSA:
             self.states_tree = json.load(data_file)
 
     def handle_command(self, msg, command_text):
+        self.current_text = ''
         self.chat_id = msg.chat.id
         if command_text == 'в начало':
             self.current_command = None
@@ -34,17 +35,27 @@ class FSA:
             current_command = self.traverse_commands(self.states_tree["commands"], command_text)
 
         if current_command is not None:
+
             if "parent" not in current_command:
                 current_command["parent"] = self.current_command
+
             current_command["chat_id"] = self.chat_id
+
             self.current_command = current_command
-            self.current_text = self.current_command["text"]
+
+            if "text" in self.current_command:
+                self.current_text = self.current_command["text"]
+
             self.current_markup = self.compose_markup()
+
             if "handler" in self.current_command:
                 self.current_handler = self.current_command["handler"]
-            return True
+
+            if self.current_text:
+                return True
 
         return False
+
 
     def traverse_commands(self, commands, command_text):
 

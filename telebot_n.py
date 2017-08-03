@@ -27,6 +27,7 @@ def send_message(message):
 
 @bot.message_handler(func = lambda message: True)
 def cmd_all(message):
+    print('message: "{}"'.format(message.text))
     command = message.text.lower()
     handle_command(message, command)
 
@@ -36,7 +37,7 @@ def handle_command(message, command, recursion=False):
     if handled:
         if fsa.current_command is None:
             bot.send_message(message.chat.id, hello, reply_markup=markuproot)
-        else:
+        elif fsa.current_text:
             bot.send_message(message.chat.id, fsa.current_text, reply_markup=fsa.current_markup)
     else:
         if fsa.current_handler != '':

@@ -1,54 +1,45 @@
 import json
 from urllib.request import Request, urlopen
-
+import requests
 
 class Commands:
     def __init__(self):
-        self.server_addr = "http://api.itsgreat.ru/"
+        self.server_addr = "http://z.vardex.ru/erp.sdr/hs/bot/"
         self.questions = []
 
-    def compose_url(self, method, cmd):
-        return self.server_addr + method + "?token=testtoken&sender=" + str(cmd["chat_id"])
+    def compose_url(self, method, param):
+        return self.server_addr + method + "/" + param#"?sender=" + str(cmd["chat_id"])
 
-    @classmethod
-    def store_reply_group(cls, cmd, msg_text):
-        return cls.cleverise_command("learn/store_reply_group", cmd, msg_text)
+    def request_1C(self, method, param):
+        try:
+            url = self.compose_url(method, param)
+            """binary_data = msg_text.encode('utf-8')
+            request = Request(url, data=binary_data)"""
+            username = "bot"
+            password = "6778"
+            auth = requests.auth.HTTPBasicAuth(username, password)
+            response = requests.get(url, auth=auth)
+            return json.loads(response.text)
 
-    def get_answers(self, cmd, msg_text):
-        return self.cleverise_command("qa/get_answers", cmd, msg_text)
+            request = Request(url)
+            raw_response = urlopen(request).read()
+            return json.loads(raw_response.decode())
+        except Exception as e:
+            print(e)
+            return None
 
-    def cleverise_command(self, method, cmd, msg_text):
-        url = self.compose_url(method, cmd)
-        binary_data = msg_text.encode('utf-8')
-        request = Request(url, data=binary_data)
-        raw_response = urlopen(request).read()
-        return json.loads(raw_response.decode())
+    def get_shop_phones(self, cmd, msg_text):
+        return "Вы выбрали город {}, а там мноого магазинов".format(msg_text)
 
-    def handle_get_answers(self, cmd, msg_text):
-        response = self.get_answers(cmd, msg_text)
-        if response is None:
-            return "Ошибка: qa/get_answers вернула пустой ответ"
-        if response["ok"] == True:
-            resp = str(response["answers"])
-            if resp == "[]":
-                resp = "К сожалению, Cleverise не нашел ответа на этот вопрос"
-            return resp
-        else:
-            return "Ошибка: " + str(response["error"]) + "\n " + response["description"]
-
-    def handle_json_group(self, cmd, msg_text):
-        response = self.store_reply_group(cmd, msg_text)
-        if response["ok"] == True:
-            return "Данные успешно загружены. Вы можете загрузить другую порцию данных в том же формате"
-        else:
-            return "Ошибка: " + response["error"] + "\n " + response["description"]
-
-    def handle_string_question(self, cmd, msg_text):
-        words = msg_text.split()
-        if len(words) < 3:
-            return "Вопрос должен содержать не менее 3 слов"
-        self.questions.append(msg_text)
-        return "Добавлено {} вопрос(ов)".format(len(self.questions))
+    def get_order_state(self, cmd, msg_text):
+        response = self.request_1C("getorderstate", msg_text)
+        if response:
+            if response["status"] == 0:
+                data = response["data"]
+                return "Заказ {} в статусе '{}', примерная дата доставки {}"\
+                    .format(msg_text, data["status"], data["deliveryDate"])
+            else:
+                return "Заказ {} не найден в нашей базе".format(msg_text)
 
     def handle_string_answer(self, cmd, msg_text):
         if len(self.questions) == 0:

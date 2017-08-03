@@ -2,36 +2,39 @@
   "id": "root",
   "commands": [
     {
+      "id": "get_order_state",
+      "button_text": "Узнать состояние заказа",
+      "text": "Введите номер заказа",
+      "wait_input": true,
+      "handler": "get_order_state"
+    },
+    {
       "id": "learning",
-      "button_text": "Режим обучения",
-      "text": "Обучение Cleverise заключается в предоставлении групп вопросов с общим ответом. Выберите способ ввода",
+      "button_text": "Узнать телефон магазина",
+      "text": "Магазины какого города вас интересуют?",
       "commands": [
         {
-          "id": "as_json",
-          "button_text": "В виде json-структуры",
-          "text": "Введите группу ответ-вопросы в формате json. Пример:\n { \"a\": \"answer text\", \"qs\" : [\"question 1\", \"question 2\", \"question 3\" ] }",
-          "handler" : "handle_json_group"
+          "id": "msk",
+          "button_text": "Москва",
+          "handler": "get_shop_phones"
         },
         {
-          "id": "step_by_step",
-          "button_text": "Пошаговый ввод",
-          "text": "Введите очередной вопрос. Чтобы перейти к вводу ответа, нажмите Ответ",
-          "handler" : "handle_string_question",
-          "commands": [
-            {
-              "id": "answer",
-              "button_text": "Ответ",
-              "text": "Введите ответ",
-              "handler" : "handle_string_answer"
-            }
-          ]
+          "id": "spb",
+          "button_text": "Санкт-Петербург",
+          "handler": "get_shop_phones"
+        },
+        {
+          "id": "vld",
+          "button_text": "Владивосток",
+          "handler": "get_shop_phones"
         }
       ]
     },
     {
       "id": "qa",
-      "button_text": "Вопрос-ответ",
+      "button_text": "Узнать телефон сервиса",
       "text": "Задайте вопрос в произвольной форме",
+      "wait_input": true,
       "handler" : "handle_get_answers"
     }
   ]
