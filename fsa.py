@@ -1,5 +1,6 @@
 from command_handlers import CommandHandlers
-from telebot import types
+#from telebot import types
+import telebot
 
 
 class FSA:
@@ -63,7 +64,7 @@ class FSA:
         return None
 
     def compose_markup(self):
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         if self.current_command is None:
             for comm in self.commands:
                 markup.add(comm["button_text"])
