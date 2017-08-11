@@ -4,38 +4,56 @@
     {
       "id": "get_order_state",
       "button_text": "Узнать состояние заказа",
-      "text": "Введите номер заказа",
+      "text": "Вы можете узнать состояние заказа одним из двух способов: \n1) введите полный номер телефона \n2) введите номер заказа и через пробел последние 4 цифры номера телефона",
       "wait_input": true,
       "handler": "get_order_state"
     },
     {
       "id": "learning",
-      "button_text": "Узнать телефон магазина",
+      "button_text": "Узнать контакты магазина",
       "text": "Магазины какого города вас интересуют?",
       "commands": [
         {
           "id": "msk",
           "button_text": "Москва",
-          "handler": "get_shop_phones"
+          "handler": "get_shop_info"
         },
         {
           "id": "spb",
           "button_text": "Санкт-Петербург",
-          "handler": "get_shop_phones"
+          "handler": "get_shop_info"
+        },
+        {
+          "id": "vld",
+          "button_text": "Абакан",
+          "handler": "get_shop_info"
         },
         {
           "id": "vld",
           "button_text": "Владивосток",
-          "handler": "get_shop_phones"
+          "handler": "get_shop_info"
+        },
+        {
+          "id": "vld",
+          "button_text": "Владикавказ",
+          "handler": "get_shop_info"
+        },
+        {
+          "id": "vld",
+          "button_text": "Красноярск",
+          "handler": "get_shop_info"
+        },
+        {
+          "id": "vld",
+          "button_text": "Омск",
+          "handler": "get_shop_info"
+        },
+        {
+          "id": "vld",
+          "button_text": "Тула",
+          "handler": "get_shop_info"
         }
       ]
-    },
-    {
-      "id": "qa",
-      "button_text": "Узнать телефон сервиса",
-      "text": "Задайте вопрос в произвольной форме",
-      "wait_input": true,
-      "handler" : "handle_get_answers"
     }
   ]
 }

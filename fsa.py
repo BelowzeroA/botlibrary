@@ -1,26 +1,21 @@
-from commands import Commands
-import json
+from command_handlers import CommandHandlers
 from telebot import types
 
 
 class FSA:
-
-    def __init__(self):
+    def __init__(self, chat_id, command_tree, bot):
         self.current_command = None
-        self.commands = Commands()
-        self.states_tree = ''
+        self.bot = bot
+        self.command_handlers = CommandHandlers()
         self.current_text = ''
         self.current_markup = ''
         self.current_handler = ''
-        self.chat_id = ''
-
-    def load(self, filename):
-        with open(filename, 'r', encoding='utf-8') as data_file:
-            self.states_tree = json.load(data_file)
+        self.chat_id = chat_id
+        self.command_tree = command_tree
+        self.commands = self.command_tree.states_tree["commands"]
 
     def handle_command(self, msg, command_text):
         self.current_text = ''
-        self.chat_id = msg.chat.id
         if command_text == 'в начало':
             self.current_command = None
             return True
@@ -32,7 +27,7 @@ class FSA:
                 return True
             current_command = self.current_command
         else:
-            current_command = self.traverse_commands(self.states_tree["commands"], command_text)
+            current_command = self.traverse_commands(self.commands, command_text)
 
         if current_command is not None:
 
@@ -56,7 +51,6 @@ class FSA:
 
         return False
 
-
     def traverse_commands(self, commands, command_text):
 
         for comm in commands:
@@ -71,7 +65,7 @@ class FSA:
     def compose_markup(self):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         if self.current_command is None:
-            for comm in self.states_tree["commands"]:
+            for comm in self.commands:
                 markup.add(comm["button_text"])
         else:
             if "commands" in self.current_command:
@@ -79,6 +73,9 @@ class FSA:
                     markup.add(comm["button_text"])
             markup.row("Назад", "В начало")
         return markup
+
+    def send_message(self, message, markup):
+        self.bot.send_message(self.chat_id, message, reply_markup=markup)
 
     def command_handler(self, handler=None, command=None):
         def decorator(handler, msg_text):
