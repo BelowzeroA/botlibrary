@@ -1,20 +1,27 @@
 {
-  "update_id": 10000,
-  "message": {
-    "date": 1441645532,
-    "chat": {
-      "last_name": "Test Lastname",
-      "id": 1111111,
-      "first_name": "Test",
-      "username": "Test"
-    },
-    "message_id": 1365,
-    "from": {
-      "last_name": "Test Lastname",
-      "id": 1111111,
-      "first_name": "Test",
-      "username": "Test"
-    },
-    "text": "/start"
-  }
+  "ok": true,
+  "result": [
+    {
+      "update_id": 32626138,
+      "message": {
+        "message_id": 255,
+        "from": {
+          "id": 219824595,
+          "first_name": "Below",
+          "last_name": "Zero",
+          "username": "Dmitry_Salikhov",
+          "language_code": "ru"
+        },
+        "chat": {
+          "id": 219824595,
+          "first_name": "Below",
+          "last_name": "Zero",
+          "username": "Dmitry_Salikhov",
+          "type": "private"
+        },
+        "date": 1502471791,
+        "text": "\u041c\u043e\u0441\u043a\u0432\u0430"
+      }
+    }
+  ]
 }
