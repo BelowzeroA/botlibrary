@@ -1,6 +1,6 @@
 import telebot
 from command_tree import CommandTree
-from chat_manager import ChatManager
+from chat_manager import *
 from logger import Logger
 import config
 
@@ -8,7 +8,7 @@ import config
 bot = telebot.TeleBot(config.token)
 logger = Logger("/srv/www/vardex.ru/public_html/telegram/log.txt")
 command_tree = CommandTree("bot_tree.json")
-chat_manager = ChatManager(bot, command_tree)
+chat_manager = ChatManager(bot, command_tree, TelegramMode.POLLING)
 markuproot = command_tree.get_root_markup()
 
 

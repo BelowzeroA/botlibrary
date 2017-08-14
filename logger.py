@@ -1,4 +1,4 @@
-import sys, traceback
+import sys, traceback, datetime
 
 class Logger:
 
@@ -14,6 +14,7 @@ class Logger:
             full_tb_text = traceback.extract_tb(exc_tb)
             presentation = "Exception: {} \nin {} at line {} \n traceback: {}".format(presentation, filename, line_num, full_tb_text)
 
-        text_file = open(self.filename, "w")
-        text_file.write(presentation)
+        time = datetime.datetime.now().time()
+        text_file = open(self.filename, "a")
+        text_file.write("{}: {}\n".format(time, presentation))
         text_file.close()

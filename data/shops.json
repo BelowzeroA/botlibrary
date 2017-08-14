@@ -1,27 +1,51 @@
 {
-  "ok": true,
-  "result": [
-    {
-      "update_id": 32626138,
-      "message": {
-        "message_id": 255,
-        "from": {
-          "id": 219824595,
-          "first_name": "Below",
-          "last_name": "Zero",
-          "username": "Dmitry_Salikhov",
-          "language_code": "ru"
-        },
-        "chat": {
-          "id": 219824595,
-          "first_name": "Below",
-          "last_name": "Zero",
-          "username": "Dmitry_Salikhov",
-          "type": "private"
-        },
-        "date": 1502471791,
-        "text": "\u041c\u043e\u0441\u043a\u0432\u0430"
-      }
-    }
-  ]
+  'update_id': 782508177,
+  'edited_message': None,
+  'message': {
+    'content_type': 'text',
+    'message_id': 1125,
+    'from_user': '',
+    'date': 1502703286,
+    'chat':
+    <
+    _types
+    .
+    Chat
+    object
+    at
+    0
+    x7f8925764a20
+    >,
+    'forward_from_chat': None,
+    'forward_from': None,
+    'forward_date': None,
+    'reply_to_message': None,
+    'edit_date': None,
+    'text': 'werrrmi',
+    'entities': None,
+    'audio': None,
+    'document': None,
+    'photo': None,
+    'sticker': None,
+    'video': None,
+    'voice': None,
+    'caption': None,
+    'contact': None,
+    'location': None,
+    'venue': None,
+    'new_chat_member': None,
+    'left_chat_member': None,
+    'new_chat_title': None,
+    'new_chat_photo': None,
+    'delete_chat_photo': None,
+    'group_chat_created': None,
+    'supergroup_chat_created': None,
+    'channel_chat_created': None,
+    'migrate_to_chat_id': None,
+    'migrate_from_chat_id': None,
+    'pinned_message': None
+  },
+  'inline_query': None,
+  'chosen_inline_result': None,
+  'callback_query': None
 }
