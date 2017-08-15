@@ -1,14 +1,16 @@
 import telebot
 from command_tree import CommandTree
 from chat_manager import *
+from fsa_serializer import FsaSerializer
 from logger import Logger
 import config
 
 
 bot = telebot.TeleBot(config.token)
-logger = Logger("/srv/www/vardex.ru/public_html/telegram/log.txt")
+logger = Logger("log.txt")
 command_tree = CommandTree("bot_tree.json")
-chat_manager = ChatManager(bot, command_tree, TelegramMode.POLLING)
+fsa_serializer = FsaSerializer("fsa_data", logger)
+chat_manager = ChatManager(bot, command_tree, BotMode.POLLING, fsa_serializer)
 markuproot = command_tree.get_root_markup()
 
 
@@ -20,10 +22,13 @@ def send_message(message):
     bot.send_message(message.chat.id, chat_manager.hello_message, reply_markup = markuproot)
 
 
-@bot.message_handler(func = lambda message: True)
+# @bot.message_handler(func = lambda message: True)
+@bot.message_handler(content_types=['text', 'contact'])
 def cmd_all(message):
     print('message: "{}"'.format(message.text))
-    command = message.text.lower()
+    command = ''
+    if message.content_type != 'contact':
+        command = message.text.lower()
     handle_command(message, command)
 
 

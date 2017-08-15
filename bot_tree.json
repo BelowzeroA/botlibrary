@@ -4,8 +4,23 @@
     {
       "id": "get_order_state",
       "button_text": "Узнать состояние заказа",
-      "text": "Вы можете узнать состояние заказа одним из двух способов: \n1) введите полный номер телефона \n2) введите номер заказа и через пробел последние 4 цифры номера телефона",
+      "condition": "not self.user_is_authorized",
+      "text": "Вы можете узнать состояние заказа одним из двух способов: \n1) введите полный номер телефона \n2) введите номер заказа и через пробел последние 4 цифры номера телефона \n3) привяжите номер телефона к боту, нажав кнопку ниже",
       "wait_input": true,
+      "handler": "get_order_state",
+      "commands": [
+        {
+          "id": "get_contacts",
+          "button_text": "Привязать свой номер телефона",
+          "request_contact": true,
+          "handler": "get_order_state"
+        }
+      ]
+    },
+    {
+      "id": "get_order_state",
+      "button_text": "Узнать состояние заказа",
+      "condition": "self.user_is_authorized",
       "handler": "get_order_state"
     },
     {

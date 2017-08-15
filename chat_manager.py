@@ -2,13 +2,13 @@ from enum import Enum
 from fsa import FSA
 from command_handlers import CommandHandlers
 
-class TelegramMode(Enum):
+class BotMode(Enum):
     WEBHOOK = 1
     POLLING = 2
 
 class ChatManager:
 
-    def __init__(self, bot, command_tree, mode=TelegramMode.POLLING, serializer=None):
+    def __init__(self, bot, command_tree, mode=BotMode.POLLING, serializer=None):
         self.chats = {}
         self.bot = bot
         self.mode = mode
@@ -23,6 +23,7 @@ class ChatManager:
 
         chat_id = message.chat.id
         automaton = self.get_automaton(chat_id)
+        automaton.authorize_user()
 
         handled = automaton.handle_command(message, command)
         if handled:
@@ -34,7 +35,7 @@ class ChatManager:
             if automaton.current_handler != '':
                 automaton.command_handler(automaton.current_handler)
                 handler = getattr(self.command_handlers, automaton.current_handler)
-                r = handler(automaton.current_command, message.text)
+                r = handler(automaton, message.text)
                 if r is not None:
                     if isinstance(r, str):
                         automaton.send_message(r, automaton.current_markup)
@@ -42,12 +43,12 @@ class ChatManager:
                         automaton.send_message(automaton.chat_id, r["text"])
                         self.handle_command(message, r["command"], True)
 
-        if self.mode == TelegramMode.WEBHOOK:
+        if self.mode == BotMode.WEBHOOK:
             self.fsa_serializer.save_fsa(automaton, chat_id)
 
 
     def get_automaton(self, chat_id):
-        if self.mode == TelegramMode.POLLING:
+        if self.mode == BotMode.POLLING:
             if chat_id in self.chats:
                 automaton = self.chats[chat_id]
             else:
@@ -55,8 +56,11 @@ class ChatManager:
                 self.chats[chat_id] = automaton
         else:
             assert self.fsa_serializer != None, "Property 'fsa_serializer' must be set in 'webhook' mode"
-            automaton = self.fsa_serializer.load_fsa(chat_id)
-            if automaton == None:
-                automaton = FSA(chat_id, self.command_tree, self.bot)
+            automaton = FSA(chat_id, self.command_tree, self.bot)
+            automaton_loaded = self.fsa_serializer.load_fsa(chat_id)
+            if automaton_loaded:
+                filtered_fields = {key : value for key, value in automaton_loaded.__dict__.items() if key not in FSA.unstored_fields}
+                automaton.__dict__.update(filtered_fields)
+
         return automaton
 
