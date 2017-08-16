@@ -5,19 +5,21 @@ import telebot
 
 class FSA:
 
-    unstored_fields = ["command_handlers", "command_tree", "bot", "commands"]
+    unstored_fields = ["command_handlers", "command_tree", "bot", "commands", "logger"]
 
-    def __init__(self, chat_id, command_tree, bot):
+    def __init__(self, chat_id, command_tree, bot, logger):
         self.current_command = None
         self.bot = bot
-        self.command_handlers = CommandHandlers()
+        self.command_handlers = CommandHandlers(logger)
         self.current_text = ''
         self.current_markup = ''
         self.current_handler = ''
         self.user_is_authorized = False
         self.user_phone_number = ''
+        self.try_authorize = True
         self.chat_id = chat_id
         self.command_tree = command_tree
+        self.logger = logger
         self.commands = self.command_tree.states_tree["commands"]
 
     def __getstate__(self):
@@ -41,39 +43,40 @@ class FSA:
         elif command_text == '' and msg.content_type == 'contact':
             self.user_phone_number = msg.contact.phone_number
             current_command = self.current_command
+            search_lambda = lambda cmd: "request_contact" in cmd and cmd["request_contact"] == True
             if current_command is None:
-                current_command = self.traverse_commands(self.commands,
-                    lambda cmd: "request_contact" in cmd and cmd["request_contact"] == True)
+                current_command = self.traverse_commands(self.commands, search_lambda)
+            elif "commands" in current_command:
+                current_command = self.traverse_commands(current_command["commands"], search_lambda)
         else:
             current_command = self.traverse_commands(self.commands, command_text)
 
         if current_command is not None:
-
             if "parent" not in current_command:
                 current_command["parent"] = self.current_command
-
             current_command["chat_id"] = self.chat_id
-
-            self.current_command = current_command
-
-            if "text" in self.current_command:
-                self.current_text = self.current_command["text"]
-
-            self.current_markup = self.compose_markup()
-
-            if "handler" in self.current_command:
-                self.current_handler = self.current_command["handler"]
-
+            self.navigate_command(current_command)
             if self.current_text:
                 return True
 
         return False
 
-    def traverse_commands(self, commands, command_or_condition):
+    def navigate_command(self, command):
+        self.current_command = command
+        if command is None:
+            self.current_text = ''
+            self.current_handler = ''
+        else:
+            if "text" in self.current_command:
+                self.current_text = self.current_command["text"]
+            if "handler" in self.current_command:
+                self.current_handler = self.current_command["handler"]
+        self.current_markup = self.compose_markup()
 
+    def traverse_commands(self, commands, command_or_condition):
         for comm in commands:
             if isinstance(command_or_condition, str):
-                if comm["button_text"].lower() == command_or_condition:
+                if comm["button_text"].lower() == command_or_condition and self.check_command_condition(comm):
                     return comm
             elif callable(command_or_condition):
                 if command_or_condition(comm):
@@ -86,11 +89,12 @@ class FSA:
         return None
 
     def authorize_user(self):
-        if self.user_is_authorized:
+        if self.user_is_authorized or not self.try_authorize:
             return
         authorize_user = getattr(self.command_handlers, "authorize_user", None)
         if callable(authorize_user):
             self.command_handlers.authorize_user(self)
+            self.try_authorize = False
 
     def compose_markup(self):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -117,9 +121,24 @@ class FSA:
             condition_is_met = self.check_condition(command["condition"])
         return condition_is_met
 
-    def send_message(self, message, markup):
+    def redirect_on_success(self):
+        if self.current_command and "redirect_on_success" in self.current_command:
+            command = self.find_command_by_id(self.current_command["redirect_on_success"])
+            self.navigate_command(command)
+
+    def find_command_by_id(self, id):
+        if id == "root":
+            return None
+
+    def send_message(self, message, markup=None):
+        if not markup:
+            markup = self.compose_markup()
         self.bot.send_message(self.chat_id, message, reply_markup=markup)
 
     def command_handler(self, handler=None, command=None):
         def decorator(handler, msg_text):
             handler(command, msg_text)
+
+    def write_log(self, info):
+        if self.logger:
+            self.logger.write(info)

@@ -10,10 +10,11 @@
       "handler": "get_order_state",
       "commands": [
         {
-          "id": "get_contacts",
+          "id": "get_contacts_bind_phone_number",
           "button_text": "Привязать свой номер телефона",
           "request_contact": true,
-          "handler": "get_order_state"
+          "handler": "get_order_state",
+          "redirect_on_success": "root"
         }
       ]
     },

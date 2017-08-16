@@ -11,16 +11,7 @@ logger = Logger("log.txt")
 command_tree = CommandTree("bot_tree.json")
 fsa_serializer = FsaSerializer("fsa_data", logger)
 chat_manager = ChatManager(bot, command_tree, BotMode.POLLING, fsa_serializer)
-markuproot = command_tree.get_root_markup()
-
-
-@bot.message_handler(commands=['start'])
-def send_message(message):
-    """
-    Приветственное сообщение.
-    """
-    bot.send_message(message.chat.id, chat_manager.hello_message, reply_markup = markuproot)
-
+#markuproot = command_tree.get_root_markup()
 
 # @bot.message_handler(func = lambda message: True)
 @bot.message_handler(content_types=['text', 'contact'])
