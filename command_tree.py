@@ -11,7 +11,6 @@ class CommandTree:
 
     def get_root_markup(self):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
-        #markup = _types.ReplyKeyboardMarkup(resize_keyboard=True)
         for comm in self.states_tree["commands"]:
             markup.add(comm["button_text"])
         return markup

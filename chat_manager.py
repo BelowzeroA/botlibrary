@@ -34,24 +34,34 @@ class ChatManager:
                 automaton.send_message(automaton.current_text, automaton.current_markup)
         else:
             if automaton.current_handler != '':
-                automaton.command_handler(automaton.current_handler)
-                handler = getattr(self.command_handlers, automaton.current_handler)
-                r = handler(automaton, message.text)
-                if r is not None:
-                    if isinstance(r, str):
-                        automaton.send_message(r, automaton.current_markup)
-                    elif isinstance(r, dict):
-                        if r["success"]:
-                            automaton.redirect_on_success()
-                        automaton.send_message(r["message"])
-                    elif not recursion:
-                        automaton.send_message(automaton.chat_id, r["text"])
-                        self.handle_command(message, r["command"], True)
+                self.handle_custom_command(automaton, message)
             else:
                 self.send_start_message(automaton)
 
         if self.mode == BotMode.WEBHOOK:
             self.fsa_serializer.save_fsa(automaton, chat_id)
+
+    def handle_custom_command(self, automaton, message):
+        automaton.command_handler(automaton.current_handler)
+        handler = getattr(self.command_handlers, automaton.current_handler)
+        r = handler(automaton, message.text)
+        if r is not None:
+            if isinstance(r, str):
+                automaton.send_message(r, automaton.current_markup)
+            elif isinstance(r, dict):
+                markup = None
+                markdown = None
+                if "success" in r and r["success"]:
+                    automaton.redirect_on_success()
+                if "markup" in r:
+                    markup = r["markup"]
+                    automaton.add_default_nav_buttons(markup)
+                if "markdown" in r:
+                    markdown = True
+                automaton.send_message(r["message"], markup, markdown)
+            # elif not recursion:
+            #     automaton.send_message(automaton.chat_id, r["text"])
+            #     self.handle_command(message, r["command"], True)
 
     def send_start_message(self, automaton):
         #automaton.send_message(self.hello_message, self.command_tree.get_root_markup())
@@ -77,4 +87,3 @@ class ChatManager:
     def write_log(self, info):
         if self.logger:
             self.logger.write(info)
-

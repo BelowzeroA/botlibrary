@@ -109,8 +109,11 @@ class FSA:
                         request_contact = "request_contact" in comm and comm["request_contact"]
                         button = telebot.types.KeyboardButton(text=comm["button_text"], request_contact=request_contact)
                         markup.add(button)
-            markup.row("Назад", "В начало")
+            self.add_default_nav_buttons(markup)
         return markup
+
+    def add_default_nav_buttons(self, markup):
+        markup.row("Назад", "В начало")
 
     def check_condition(self, condition):
         return eval(condition)
@@ -130,10 +133,13 @@ class FSA:
         if id == "root":
             return None
 
-    def send_message(self, message, markup=None):
+    def send_message(self, message, markup=None, markdown=None):
         if not markup:
             markup = self.compose_markup()
-        self.bot.send_message(self.chat_id, message, reply_markup=markup)
+        if markdown:
+            self.bot.send_message(self.chat_id, message, reply_markup=markup, parse_mode='Markdown')
+        else:
+            self.bot.send_message(self.chat_id, message, reply_markup=markup)
 
     def command_handler(self, handler=None, command=None):
         def decorator(handler, msg_text):
