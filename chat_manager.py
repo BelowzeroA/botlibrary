@@ -7,7 +7,9 @@ class BotMode(Enum):
     POLLING = 2
 
 class ChatManager:
-
+    """
+    Класс для управления чатами в режиме POLLING или обработки текущей команды в режиме WEBHOOK
+    """
     def __init__(self, bot, command_tree, mode=BotMode.POLLING, serializer=None, logger=None):
         self.chats = {}
         self.bot = bot
@@ -21,7 +23,9 @@ class ChatManager:
             self.hello_message = hello.read()
 
     def handle_command(self, message, command, recursion=False):
-
+        """
+        Обработчик текущей команды. Находит нужный автомат и передает ему команду на обработку
+        """
         chat_id = message.chat.id
         automaton = self.get_automaton(chat_id)
         automaton.authorize_user()
@@ -68,6 +72,11 @@ class ChatManager:
         automaton.send_message(self.hello_message, automaton.compose_markup())
 
     def get_automaton(self, chat_id):
+        """
+        Получает конечный автомат для конкретного пользователя
+        Находим в словаре (в режиме POLLING) или загружаем из pickle (в режиме WEBHOOK) автомат по ID пользователя
+        Если сохраненного автомата нет, создаем его и помещаем в хранилище
+        """
         if self.mode == BotMode.POLLING:
             if chat_id in self.chats:
                 automaton = self.chats[chat_id]

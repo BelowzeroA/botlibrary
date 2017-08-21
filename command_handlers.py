@@ -6,10 +6,14 @@ import telebot
 
 subway_field_name = "subway"
 
+
 class CommandHandlers:
+    """
+    Реализует обработчики команд для конкретного бота
+    """
 
     def __init__(self, logger):
-        #self.server_addr = "http://z.vardex.ru/erp.sdr/hs/bot/"
+        # self.server_addr = "http://z.vardex.ru/erp.sdr/hs/bot/"
         self.server_addr = "http://iis/erp/hs/bot/"
         self.shops_info_addr = "https://www.vardex.ru/api/v1/shops/telegram.php?KEY=fba0eede-a31f-4cc6-954d-64296e80ff45"
         self.questions = []
@@ -90,12 +94,12 @@ class CommandHandlers:
         for shops_info in shops_json.values():
             for shop_info in shops_info:
                 if get_field_value(shop_info, subway_field_name) == subway or \
-                    get_field_value(shop_info, "city") == subway :
+                                get_field_value(shop_info, "city") == subway:
                     shops.append(shop_info)
         return shops
 
     def reply_with_subway_stations(self, shops):
-        reply = { "message" : "Выберите город/станцию метро" }
+        reply = {"message": "Выберите город/станцию метро"}
         subways = set()
         for shop_info in shops:
             if subway_field_name in shop_info:
@@ -103,7 +107,7 @@ class CommandHandlers:
             else:
                 subways.add(shop_info["city"])
 
-        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard = True)
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         for subway in sorted(subways):
             markup.add(subway)
         reply["markup"] = markup
@@ -118,7 +122,8 @@ class CommandHandlers:
             city = get_field_value(shop_info, "city", lower_value=False)
             city = " г. {},".format(city) if city and show_city else ''
 
-            subway = "м. {},".format(shop_info[subway_field_name]) if subway_field_name in shop_info and shop_info[subway_field_name] else ""
+            subway = "м. {},".format(shop_info[subway_field_name]) if subway_field_name in shop_info and shop_info[
+                subway_field_name] else ""
 
             phone = shop_info["telephone"]
             phone_cleaned = self.clean_phone_number(phone)
@@ -131,13 +136,14 @@ class CommandHandlers:
             phone_with_addon = "{} доб. {}".format(phone, phone_addon) if phone_addon else phone
 
             address = (shop_info["address"] if shop_info["address"] else "")
-            reply += "{}.{} {}\n  {} {} {}\n{}\n".format(counter, city, shop_info["name"], subway, address, phone_with_addon, shop_info["schedule"])
+            reply += "{}.{} {}\n  {} {} {}\n{}\n".format(counter, city, shop_info["name"], subway, address,
+                                                         phone_with_addon, shop_info["schedule"])
         reply = reply.replace('&quot;', "'")
         return reply
 
     def get_order_state(self, automaton, msg_text):
         query = msg_text
-        reply = { "success": False, "message" : "" }
+        reply = {"success": False, "message": ""}
         if not msg_text and automaton.user_phone_number != '':
             query = automaton.user_phone_number
             if not self.try_bind(automaton, reply):
@@ -150,7 +156,6 @@ class CommandHandlers:
                 request_for_first_time = False
             else:
                 query = automaton.user_phone_number
-
 
         response = self.request_1C("getorderstate", self.clean_query(query))
         if response:
@@ -195,7 +200,8 @@ class CommandHandlers:
                     reply["message"] = response["error"]
                     return False
                 else:
-                    reply["message"] = "Ваш Телеграм ID успешно привязан к телефону {}\n".format(automaton.user_phone_number)
+                    reply["message"] = "Ваш Телеграм ID успешно привязан к телефону {}\n".format(
+                        automaton.user_phone_number)
                     automaton.user_is_authorized = True
         return True
 
