@@ -3,7 +3,12 @@ import telebot
 
 
 class FSA:
+    """
+     Класс представляет собой реализацию конечного автомата для навигации по иерархической системе команд,
+     а так же хранение текущего состояния пользователя.
+    """
 
+    # Поля, которые мы не сериализуем
     unstored_fields = ["command_handlers", "command_tree", "bot", "commands", "logger"]
 
     def __init__(self, chat_id, command_tree, bot, logger):
@@ -22,12 +27,20 @@ class FSA:
         self.commands = self.command_tree.states_tree["commands"]
 
     def __getstate__(self):
+        """
+        переопределяем __getstate__() для того чтобы возвращать кастомный словарь полей, подлежащих сериализации
+        """
         return dict((key, value) for (key, value) in self.__dict__.items() if self.should_pickle(key))
 
     def should_pickle(self, name):
         return name not in self.unstored_fields
 
     def handle_command(self, msg, command_text):
+        """
+        Реализует логику обработки текущей команды пользователя
+        :param msg - структура telebot.types.Message
+        :param command_text - текст обрабатываемой команды
+        """
         self.current_text = ''
         if command_text == 'в начало':
             self.current_command = None
@@ -40,6 +53,9 @@ class FSA:
                 return True
             current_command = self.current_command
         elif command_text == '' and msg.content_type == 'contact':
+            """
+            Обработка команды передачи номера телефона боту
+            """
             self.user_phone_number = msg.contact.phone_number
             current_command = self.current_command
             search_lambda = lambda cmd: "request_contact" in cmd and cmd["request_contact"] == True
@@ -61,6 +77,11 @@ class FSA:
         return False
 
     def navigate_command(self, command):
+        """
+        Выполняет установку нужных полей при навигации на определенную команду
+        :param command:  json-структура, команда, в состояние которой нужно прийти
+        :return: None
+        """
         self.current_command = command
         if command is None:
             self.current_text = ''
@@ -73,6 +94,12 @@ class FSA:
         self.current_markup = self.compose_markup()
 
     def traverse_commands(self, commands, command_or_condition):
+        """
+        Ищет команду по заданным условиям
+        :param commands: Массив команд, начиная с которого нужно выполнять поиск
+        :param command_or_condition: если строка - значит текст команды, если лямбда - условие поиска
+        :return: найденная команда
+        """
         for comm in commands:
             if isinstance(command_or_condition, str):
                 if comm["button_text"].lower() == command_or_condition and self.check_command_condition(comm):
@@ -88,6 +115,10 @@ class FSA:
         return None
 
     def authorize_user(self):
+        """
+        Выполняет попытку авторизации текущего пользователя через вызов CommandHandlers.authorize_user()
+        :return:
+        """
         if self.user_is_authorized or not self.try_authorize:
             return
         authorize_user = getattr(self.command_handlers, "authorize_user", None)
@@ -96,6 +127,10 @@ class FSA:
             self.try_authorize = False
 
     def compose_markup(self):
+        """
+        Заполняет класс ReplyKeyboardMarkup для текущей команды
+        :return:
+        """
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         if self.current_command is None:
             for comm in self.commands:
@@ -112,6 +147,9 @@ class FSA:
         return markup
 
     def add_default_nav_buttons(self, markup):
+        """
+        Добавляет навигационные кнопки Назад и В начало в класс ReplyKeyboardMarkup
+        """
         markup.row("Назад", "В начало")
 
     def check_condition(self, condition):
@@ -133,6 +171,13 @@ class FSA:
             return None
 
     def send_message(self, message, markup=None, markdown=None):
+        """
+        Отправляет сообщение в чат текущему пользователю
+        :param message: текст сообщения
+        :param markup: класс ReplyKeyboardMarkup - кнопки к команде
+        :param markdown: необходимость парсить Markdown
+        :return:
+        """
         if not markup:
             markup = self.compose_markup()
         if markdown:
@@ -141,6 +186,12 @@ class FSA:
             self.bot.send_message(self.chat_id, message, reply_markup=markup)
 
     def command_handler(self, handler=None, command=None):
+        """
+        Вызов обработчика команды через декоратор
+        :param handler:
+        :param command:
+        :return:
+        """
         def decorator(handler, msg_text):
             handler(command, msg_text)
 
