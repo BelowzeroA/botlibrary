@@ -1,5 +1,4 @@
 from command_handlers import CommandHandlers
-#from telebot import types
 import telebot
 
 
