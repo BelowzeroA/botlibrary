@@ -20,6 +20,12 @@ except Exception as e:
 
 
 def application(env, start_response):
+    """
+    Входная точка бота в режиме WEBHOOK
+    :param env:
+    :param start_response:
+    :return:
+    """
     error_str = ''
     try:
         request_body_size = int(env['CONTENT_LENGTH'])
