@@ -15,6 +15,7 @@ class CommandHandlers:
     def __init__(self, logger):
         # self.server_addr = "http://z.vardex.ru/erp.sdr/hs/bot/"
         self.server_addr = "http://iis/erp/hs/bot/"
+        self.live_support_id = '280586415'
         self.shops_info_addr = "https://www.vardex.ru/api/v1/shops/telegram.php?KEY=fba0eede-a31f-4cc6-954d-64296e80ff45"
         self.questions = []
         self.logger = logger
@@ -122,8 +123,8 @@ class CommandHandlers:
             city = get_field_value(shop_info, "city", lower_value=False)
             city = " г. {},".format(city) if city and show_city else ''
 
-            subway = "м. {},".format(shop_info[subway_field_name]) if subway_field_name in shop_info and shop_info[
-                subway_field_name] else ""
+            subway = "м. {},".format(shop_info[subway_field_name]) \
+                if subway_field_name in shop_info and shop_info[subway_field_name] else ""
 
             phone = shop_info["telephone"]
             phone_cleaned = self.clean_phone_number(phone)
@@ -219,6 +220,11 @@ class CommandHandlers:
             data = response["data"]
             automaton.user_phone_number = self.clean_phone_number(data["phone_number"])
             automaton.user_is_authorized = True
+
+    def unrecognized_command_handler(self, automaton, message):
+        automaton.send_message("🐧 вы что-то такое сказали, а я не понял. Перенаправил сообщение на техподдержку, сейчас они к вам постучатся")
+        automaton.bot.forward_message(self.live_support_id, message.chat.id, message.message_id)
+        return True
 
     def clean_phone_number(self, phone_number):
         return re.sub('[\- +()]', '', phone_number)

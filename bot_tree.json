@@ -5,13 +5,13 @@
       "id": "get_order_state",
       "button_text": "Узнать состояние заказа",
       "condition": "not self.user_is_authorized",
-      "text": "Вы можете узнать состояние заказа одним из трех способов: \n1) введите полный номер телефона \n2) введите номер заказа и через пробел последние 4 цифры номера телефона \n3) привяжите номер телефона к боту, нажав кнопку ниже",
+      "text": "Узнать состояние заказа: \n1) Введите номер вашего телефона \n2) Введите номер заказа и 4 последние цифры номера телефона через пробел \n3) Привяжите номер телефона к боту, выбрав одну из кнопок меню",
       "wait_input": true,
       "handler": "get_order_state",
       "commands": [
         {
           "id": "get_contacts_bind_phone_number",
-          "button_text": "Привязать свой номер телефона",
+          "button_text": "Привязать номер телефона",
           "request_contact": true,
           "handler": "get_order_state",
           "redirect_on_success": "root"
@@ -25,30 +25,7 @@
       "handler": "get_order_state"
     },
     {
-      "id": "get_repair_state",
-      "button_text": "Узнать состояние заявки на ремонт",
-      "condition": "not self.user_is_authorized",
-      "text": "Вы можете узнать состояние заявки одним из двух способов: \n1) Введите номер заявки на ремонт \n2) привяжите номер телефона к боту, нажав кнопку ниже",
-      "wait_input": true,
-      "handler": "get_repair_state",
-      "commands": [
-        {
-          "id": "get_repair_bind_phone_number",
-          "button_text": "Привязать свой номер телефона",
-          "request_contact": true,
-          "handler": "get_repair_state",
-          "redirect_on_success": "root"
-        }
-      ]
-    },
-    {
-      "id": "get_repair_state",
-      "button_text": "Узнать состояние заявки на ремонт",
-      "condition": "self.user_is_authorized",
-      "handler": "get_repair_state"
-    },
-    {
-      "id": "learning",
+      "id": "get_shops_data",
       "button_text": "Контакты магазинов",
       "text": "Магазины какого города вас интересуют?",
       "commands": [
@@ -103,6 +80,29 @@
       "id": "get_service_corners",
       "button_text": "Контакты сервис-центров",
       "handler": "get_service_corners"
+    } ,
+    {
+      "id": "get_repair_state",
+      "button_text": "Узнать состояние заявки на ремонт",
+      "condition": "not self.user_is_authorized",
+      "text": "Вы можете узнать состояние заявки одним из двух способов: \n1) Введите номер заявки на ремонт \n2) привяжите номер телефона к боту, нажав кнопку ниже",
+      "wait_input": true,
+      "handler": "get_repair_state",
+      "commands": [
+        {
+          "id": "get_repair_bind_phone_number",
+          "button_text": "Привязать свой номер телефона",
+          "request_contact": true,
+          "handler": "get_repair_state",
+          "redirect_on_success": "root"
+        }
+      ]
+    },
+    {
+      "id": "get_repair_state",
+      "button_text": "Узнать состояние заявки на ремонт",
+      "condition": "self.user_is_authorized",
+      "handler": "get_repair_state"
     }
   ]
 }

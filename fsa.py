@@ -35,6 +35,11 @@ class FSA:
     def should_pickle(self, name):
         return name not in self.unstored_fields
 
+    def reset(self):
+        self.current_command = None
+        self.current_handler = ''
+        self.current_text = ''
+
     def handle_command(self, msg, command_text):
         """
         Реализует логику обработки текущей команды пользователя
@@ -44,8 +49,10 @@ class FSA:
         self.current_text = ''
         if command_text == 'в начало':
             self.current_command = None
+            self.current_handler = ''
             return True
         if command_text == 'назад':
+            self.current_handler = ''
             if self.current_command is None:
                 return True
             self.current_command = self.current_command["parent"]
@@ -125,6 +132,15 @@ class FSA:
         if callable(authorize_user):
             self.command_handlers.authorize_user(self)
             self.try_authorize = False
+
+    def handle_unrecognized_command(self, message):
+        """
+        Выполняет попытку обработки команды, не входящей в дерево
+        :return:
+        """
+        unrecognized_command_handler = getattr(self.command_handlers, "unrecognized_command_handler", None)
+        if callable(unrecognized_command_handler):
+            return unrecognized_command_handler(self, message)
 
     def compose_markup(self):
         """

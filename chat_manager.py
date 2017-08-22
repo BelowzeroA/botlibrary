@@ -39,8 +39,14 @@ class ChatManager:
         else:
             if automaton.current_handler != '':
                 self.handle_custom_command(automaton, message)
-            else:
+            elif command == "/start":
+                automaton.reset()
                 self.send_start_message(automaton)
+            else:
+                # unrecognized command
+                result = automaton.handle_unrecognized_command(message)
+                if result is None:
+                    self.send_start_message(automaton)
 
         if self.mode == BotMode.WEBHOOK:
             self.fsa_serializer.save_fsa(automaton, chat_id)
@@ -68,8 +74,7 @@ class ChatManager:
             #     self.handle_command(message, r["command"], True)
 
     def send_start_message(self, automaton):
-        #automaton.send_message(self.hello_message, self.command_tree.get_root_markup())
-        automaton.send_message(self.hello_message, automaton.compose_markup())
+        automaton.send_message(self.hello_message, automaton.compose_markup(), markdown=True)
 
     def get_automaton(self, chat_id):
         """

@@ -32,7 +32,7 @@ def application(env, start_response):
         request_body = env['wsgi.input'].read(request_body_size)
         request_json = request_body.decode("utf-8")
         update = types.Update.de_json(request_json)
-        logger.write(update)
+        #logger.write(update)
         cmd_all(update.message)
         #logger.write(update)
         #bot.process_new_updates([update])
@@ -53,14 +53,10 @@ def application(env, start_response):
 
 def cmd_all(message):
     command = ''
+    logger.write("message: {}".format(message))
     if message.content_type != 'contact':
         command = message.text.lower()
     handle_command(message, command)
 
 def handle_command(message, command):
     chat_manager.handle_command(message, command, False)
-
-# if __name__ == '__main__':
-#     print("bot has started..")
-#     while True:
-#         bot.polling(none_stop=False)
