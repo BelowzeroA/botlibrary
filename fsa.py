@@ -25,6 +25,8 @@ class FSA:
         self.command_tree = command_tree
         self.logger = logger
         self.commands = self.command_tree.states_tree["commands"]
+        self.properties = {}
+        self.current_message = ''
 
     def __getstate__(self):
         """

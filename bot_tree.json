@@ -103,6 +103,44 @@
       "button_text": "Узнать состояние заявки на ремонт",
       "condition": "self.user_is_authorized",
       "handler": "get_repair_state"
+    },
+    {
+      "id": "vardex-club",
+      "text": "Добро пожаловать в программу лояльности Вардекс Клаб!",
+      "button_text": "Вардекс Клаб",
+      "commands": [
+        {
+          "id": "vc_bind_phone_number",
+          "condition": "not self.user_is_authorized",
+          "button_text": "Привязать номер телефона",
+          "request_contact": true,
+          "handler": "vc_get_info",
+          "redirect_on_success": "root"
+        },
+        {
+          "id": "vc_bind_phone_number",
+          "button_text": "Как вступить",
+          "text": "Смотрите видео https://www.youtube.com/watch?v=q2bm8NYWI9k "
+        },
+        {
+          "id": "vc_bind_phone_number",
+          "button_text": "Привилегии статусов",
+          "text": "Текст привилегий статусов"
+        },
+        {
+          "id": "vc_bind_phone_number",
+          "condition": "self.properties['hasBonusAccount']",
+          "button_text": "Узнать состояние баланса",
+          "handler": "vc_get_balance"
+        },
+        {
+          "id": "vc_bind_phone_number",
+          "condition": "self.properties['hasBonusAccount']",
+          "button_text": "Обратная связь",
+          "text": "Напишите ваше сообщение, а я направлю его консультанту",
+          "handler": "vc_forward_chat"
+        }
+      ]
     }
   ]
 }

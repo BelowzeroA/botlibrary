@@ -14,8 +14,8 @@ class CommandHandlers:
 
     def __init__(self, logger):
         # self.server_addr = "http://z.vardex.ru/erp.sdr/hs/bot/"
-        self.server_addr = "http://iis/erp/hs/bot/"
-        self.live_support_id = '280586415'
+        self.server_addr = "http://iis/erp.sdr/hs/bot/"
+        self.live_support_ids = '280586415'
         self.shops_info_addr = "https://www.vardex.ru/api/v1/shops/telegram.php?KEY=fba0eede-a31f-4cc6-954d-64296e80ff45"
         self.questions = []
         self.logger = logger
@@ -50,6 +50,41 @@ class CommandHandlers:
     def get_json(self, url, auth):
         response = requests.get(url, auth=auth)
         return json.loads(response.text)
+
+    def vc_get_info(self, automaton, msg_text):
+        query = msg_text
+        reply = {"success": False, "message": ""}
+        if not msg_text and automaton.user_phone_number != '':
+            if not self.try_bind(automaton, reply):
+                return reply
+        return reply
+
+    def vc_forward_chat(self, automaton, msg_text):
+        automaton.send_message("Перенаправил сообщение консультанту, сейчас он/она к вам постучится")
+        automaton.bot.forward_message(self.live_support_ids, automaton.chat_id, automaton.current_message.message_id)
+        return True
+
+    def vc_get_balance(self, automaton, msg_text):
+        query = msg_text
+        reply = {"success": False, "message": ""}
+        if not msg_text and automaton.user_phone_number != '':
+            if not self.try_bind(automaton, reply):
+                return reply
+
+        if not all(char.isdigit() for char in msg_text) and automaton.user_is_authorized:
+            query = automaton.user_phone_number
+
+        response = self.request_1C("getbonusinfo", self.clean_query(query))
+        if response:
+            if response["status"] == 0:
+                data = response["data"]
+                reply["message"] += data["message"]
+                reply["success"] = True
+                return reply
+            else:
+                reply["message"] = response["error"]
+                return reply
+        return reply
 
     def get_shop_info(self, automaton, msg_text):
         found_shops = None
@@ -204,6 +239,8 @@ class CommandHandlers:
                     reply["message"] = "Ваш Телеграм ID успешно привязан к телефону {}\n".format(
                         automaton.user_phone_number)
                     automaton.user_is_authorized = True
+                    if get_field_value(response["data"], "hasBonusAccount"):
+                        automaton.properties["hasBonusAccount"] = True
         return True
 
     def clean_query(self, query):
@@ -214,16 +251,19 @@ class CommandHandlers:
         return cleaned.strip()
 
     def authorize_user(self, automaton):
+        automaton.properties["hasBonusAccount"] = False
         response = self.request_1C("getuserphone", automaton.chat_id)
         self.write_log(response)
         if response and response["status"] == 0:
             data = response["data"]
             automaton.user_phone_number = self.clean_phone_number(data["phone_number"])
             automaton.user_is_authorized = True
+            if get_field_value(response["data"], "hasBonusAccount"):
+                automaton.properties["hasBonusAccount"] = True
 
     def unrecognized_command_handler(self, automaton, message):
-        automaton.send_message("🐧 вы что-то такое сказали, а я не понял. Перенаправил сообщение на техподдержку, сейчас они к вам постучатся")
-        automaton.bot.forward_message(self.live_support_id, message.chat.id, message.message_id)
+        automaton.send_message("😉 вы что-то такое сказали, а я не понял. Перенаправил сообщение на техподдержку, сейчас они к вам постучатся")
+        automaton.bot.forward_message(self.live_support_ids, message.chat.id, message.message_id)
         return True
 
     def clean_phone_number(self, phone_number):

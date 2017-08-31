@@ -28,6 +28,7 @@ class ChatManager:
         """
         chat_id = message.chat.id
         automaton = self.get_automaton(chat_id)
+        automaton.current_message = message
         automaton.authorize_user()
 
         handled = automaton.handle_command(message, command)
