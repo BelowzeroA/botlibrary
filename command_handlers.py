@@ -14,8 +14,9 @@ class CommandHandlers:
 
     def __init__(self, logger):
         # self.server_addr = "http://z.vardex.ru/erp.sdr/hs/bot/"
-        self.server_addr = "http://iis/erp.sdr/hs/bot/"
-        self.live_support_ids = '280586415'
+        self.server_addr = "http://iis/erp/hs/bot/"
+        #self.live_support_ids = '280586415'
+        self.live_support_ids = '435395826'
         self.shops_info_addr = "https://www.vardex.ru/api/v1/shops/telegram.php?KEY=fba0eede-a31f-4cc6-954d-64296e80ff45"
         self.questions = []
         self.logger = logger

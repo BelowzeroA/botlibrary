@@ -32,7 +32,6 @@ def application(env, start_response):
         request_body = env['wsgi.input'].read(request_body_size)
         request_json = request_body.decode("utf-8")
         update = types.Update.de_json(request_json)
-        #logger.write(update)
         cmd_all(update.message)
         #logger.write(update)
         #bot.process_new_updates([update])
