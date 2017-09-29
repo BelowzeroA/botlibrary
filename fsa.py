@@ -98,6 +98,8 @@ class FSA:
         else:
             if "text" in self.current_command:
                 self.current_text = self.current_command["text"]
+            if "content" in self.current_command:
+                self.current_text = self.command_tree.content[self.current_command["id"]]
             if "handler" in self.current_command:
                 self.current_handler = self.current_command["handler"]
         self.current_markup = self.compose_markup()

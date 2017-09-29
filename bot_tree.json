@@ -79,7 +79,8 @@
     {
       "id": "get_service_corners",
       "button_text": "Контакты сервис-центров",
-      "handler": "get_service_corners"
+      "handler": "get_service_corners",
+      "content": "service_corners_contacts.txt"
     } ,
     {
       "id": "get_repair_state",
@@ -118,14 +119,14 @@
           "redirect_on_success": "root"
         },
         {
-          "id": "vc_bind_phone_number",
+          "id": "vc_howto_sign_in",
           "button_text": "Как вступить",
-          "text": "Смотрите видео https://www.youtube.com/watch?v=q2bm8NYWI9k "
+          "content": "howto_sign_in.txt"
         },
         {
-          "id": "vc_bind_phone_number",
+          "id": "vc_status_privilegies",
           "button_text": "Привилегии статусов",
-          "text": "Текст привилегий статусов"
+          "content": "status_privilegies.txt"
         },
         {
           "id": "vc_bind_phone_number",
